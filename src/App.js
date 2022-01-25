@@ -9,7 +9,10 @@ import {
   Button,
   Select,
 } from "@chakra-ui/react";
-import { Formik, Form } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
+
+import * as Yup from "yup";
+
 const income = 15000;
 
 const EXPENSE_TYPE = {
@@ -55,9 +58,18 @@ function App() {
             category: "jedzenie",
             expense: "",
             howMuch: "",
-            //  expenseType: EXPENSE_TYPE.ONE_TIME,
             expenseType: " EXPENSE_TYPE.ONE_TIME",
           }}
+          validationSchema={Yup.object().shape({
+            category: Yup.mixed().oneOf(
+              CATEGORY_OPTIONS.map((category) => category.value)
+            ),
+            expense: Yup.string().required("Wpisz wydatek"),
+            howMuch: Yup.number().min(
+              0.01,
+              "Nic nie kosztuje 0 zł- wpisz kwotę"
+            ),
+          })}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
             resetForm();
@@ -69,6 +81,8 @@ function App() {
             handleSubmit,
             isSubmitting,
             setFieldValue,
+            errors,
+            touched,
           }) => (
             <Form onSubmit={handleSubmit}>
               <FormControl isRequired my="2">
@@ -81,7 +95,7 @@ function App() {
                   onChange={(e, { value }) => setFieldValue("category", value)}
                   required
                   search
-                  error={Boolean(false)}
+                  error={Boolean(errors.category && touched.category)}
                 >
                   {CATEGORY_OPTIONS.map((category) => (
                     <option key={category.key} value={category.value}>
@@ -89,6 +103,10 @@ function App() {
                     </option>
                   ))}
                 </Select>
+                <ErrorMessage
+                  name="category"
+                  render={(msg) => <div>{msg}</div>}
+                />
               </FormControl>
 
               <FormControl isRequired my="2">
@@ -100,8 +118,12 @@ function App() {
                   value={values.expense}
                   onChange={handleChange}
                   required
-                  error={Boolean(false)}
+                  error={Boolean(errors.expense && touched.expense)}
                 ></Input>
+                <ErrorMessage
+                  name="expense"
+                  render={(msg) => <div>{msg}</div>}
+                />
               </FormControl>
 
               <FormControl isRequired my="2">
@@ -115,8 +137,12 @@ function App() {
                   value={values.howMuch}
                   onChange={handleChange}
                   required
-                  error={Boolean(false)}
+                  error={Boolean(errors.howMuch && touched.howMuch)}
                 ></Input>
+                <ErrorMessage
+                  name="howMuch"
+                  render={(msg) => <Text color="red">{msg}</Text>}
+                />
               </FormControl>
 
               <FormControl isRequired my="2">
