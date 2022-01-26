@@ -9,30 +9,17 @@ import {
   Button,
   Select,
 } from "@chakra-ui/react";
-import { Formik, Form, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage, Field } from "formik";
 
 import * as Yup from "yup";
 
 const income = 15000;
 
-const EXPENSE_TYPE = {
-  ONE_TIME: "once",
-  FIXED: "fixed",
-};
 const CATEGORY_OPTIONS = [
   { key: "jedzenie", text: "jedzenie", value: "jedzenie" },
   { key: "inne", text: "inne", value: "inne" },
   { key: "firma", text: "firma", value: "firma" },
   { key: "mieszkanie", text: "mieszkanie", value: "mieszkanie" },
-];
-
-const EXPENSE_TYPE_OPTIONS = [
-  { key: EXPENSE_TYPE.FIXED, text: "powtarza się", value: EXPENSE_TYPE.FIXED },
-  {
-    key: EXPENSE_TYPE.ONE_TIME,
-    text: "jednorazowy",
-    value: EXPENSE_TYPE.ONE_TIME,
-  },
 ];
 
 function App() {
@@ -57,8 +44,8 @@ function App() {
           initialValues={{
             category: "jedzenie",
             expense: "",
-            howMuch: "",
-            expenseType: " EXPENSE_TYPE.ONE_TIME",
+            howMuch: 0,
+            fixed: false,
           }}
           validationSchema={Yup.object().shape({
             category: Yup.mixed().oneOf(
@@ -73,6 +60,7 @@ function App() {
           onSubmit={(values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
             resetForm();
+            alert(JSON.stringify(values, null, 2));
           }}
         >
           {({
@@ -145,27 +133,11 @@ function App() {
                 />
               </FormControl>
 
-              <FormControl isRequired my="2">
-                <FormLabel htmlFor="expenseType">Typ wydatku</FormLabel>
-                <Select
-                  id="expenseType"
-                  placeholder="Typ wydatku"
-                  option={EXPENSE_TYPE_OPTIONS}
-                  value={values.expenseType.text}
-                  onChange={(e, { value }) =>
-                    setFieldValue("expenseType", value)
-                  }
-                  required
-                  search
-                  error={Boolean(false)}
-                >
-                  {EXPENSE_TYPE_OPTIONS.map((expense) => (
-                    <option key={expense.key} value={expense.value}>
-                      {expense.text}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
+              <label>
+                <Field type="checkbox" name="fixed" />
+                Wydatek powtarza się
+              </label>
+
               <Button
                 w="100%"
                 type="submit"
